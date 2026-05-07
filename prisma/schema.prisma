@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String @id @default(uuid())
+  name     String // Not Null
+  email    String @unique // Not Null
+  password String // Not Null
+  role     Role   @default(USER) // Not Null
+  status   Status @default(PENDING) // Not Null
+
+  // Optional Fields (Nullable)
+  email_verified_at      DateTime?
+  phone                  String?
+  rating                 Float?        @default(0.0)
+  profile_photo          String?
+  fcm_token              String?
+  current_lat            String?
+  current_lng            String?
+  language               String?       @default("en")
+  app_version            String?
+  distance_unit          DistanceUnit? @default(KM)
+  remember_token         String?
+  reason_deleted_account String?
+
+  // Timestamps
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+  driver     Driver?
+}
+
+enum Role {
+  USER
+  SYSTEM_ADMIN
+  MANAGER
+  ADMIN
+  SUPPORT
+  PASSENGER
+  DRIVER
+}
+
+enum Status {
+  ACTIVE
+  INACTIVE
+  PENDING
+  BANNED
+}
+
+enum DistanceUnit {
+  KM
+  MILES
+}
+
+model Driver {
+  id               String   @id @default(uuid())
+  user_id          String   @unique
+  license_number   String   @unique
+  license_expiry   DateTime
+  vehicle_model    String
+  vehicle_color    String
+  plate_number     String   @unique
+  vehicle_year     String
+  seat_capacity    Int      @default(4)
+  car_type         String? // Maslan: Sedan, SUV, etc.
+  license_copy     String? // File path ya URL
+  id_card_copy     String? // File path ya URL
+  vehicle_reg_copy String? // File path ya URL
+  car_image        String? // Jo aapne extra manga tha
+  is_verified      Boolean  @default(false)
+  is_online        Boolean  @default(false)
+  is_available     Boolean  @default(true)
+
+  // Timestamps
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+
+  // Relation with User (Agar aapne User model banaya hua hai)
+  user User @relation(fields: [user_id], references: [id])
+}
