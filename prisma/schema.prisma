@@ -35,10 +35,12 @@ model User {
   reason_deleted_account String?
 
   // Timestamps
-  created_at DateTime  @default(now())
-  updated_at DateTime  @updatedAt
-  deleted_at DateTime?
-  driver     Driver?
+  created_at  DateTime     @default(now())
+  updated_at  DateTime     @updatedAt
+  deleted_at  DateTime?
+  driver      Driver?
+  roomMembers RoomMember[]
+  messages    Message[]
 }
 
 enum Role {
@@ -89,4 +91,41 @@ model Driver {
 
   // Relation with User (Agar aapne User model banaya hua hai)
   user User @relation(fields: [user_id], references: [id])
+}
+
+model Room {
+  id         String    @id @default(uuid())
+  name       String   @unique
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+
+  messages Message[]
+  members  RoomMember[]
+}
+
+model RoomMember {
+  id         Int       @id @default(autoincrement())
+  userId     String // Isay Int se String kar diya
+  roomId     String // Isay Int se String kar diya
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+  user       User      @relation(fields: [userId], references: [id])
+  room       Room      @relation(fields: [roomId], references: [id])
+
+  @@unique([userId, roomId])
+}
+
+model Message {
+  id         Int       @id @default(autoincrement())
+  content    String
+  userId     String // Isay Int se String kar diya
+  roomId     String // Isay Int se String kar diya
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+
+  user User @relation(fields: [userId], references: [id])
+  room Room @relation(fields: [roomId], references: [id])
 }

@@ -1,4 +1,3 @@
-// src/utils/apiResponse.js
 const successResponse = (res, message, data = {}, statusCode = 200) => {
     return res.status(statusCode).json({
         success: true,

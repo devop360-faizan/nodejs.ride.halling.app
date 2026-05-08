@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Socket Test</title>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+  <h2>Socket.io Test</h2>
+  <div id="status">Disconnected</div>
+  <div id="messages"></div>
+  <br>
+  <button onclick="joinRoom()">Join Room 1</button>
+  <br><br>
+  <input id="msg" placeholder="Message likho" />
+  <button onclick="sendMsg()">Send</button>
+
+  <script>
+    // Apna token yahan daalo
+    // const TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjBmZDI1YzdiLTJlMjAtNDkwOC05Zjg1LTMzYWYyNjJhMDllYiIsInJvbGUiOiJEUklWRVIiLCJpYXQiOjE3NzgyMzY0MTksImV4cCI6MTc3ODI1MDgxOX0.WdcHLfStcc_IUUkABrR519V55PT2Y34QlMdV5GO1Xs8";
+    const TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImU4MzI4YzBkLTUyZjUtNGMwYS05MTYyLWIwMDFiY2M4NGY5YSIsInJvbGUiOiJEUklWRVIiLCJpYXQiOjE3NzgyMzI1MDUsImV4cCI6MTc3ODI3MjEwNX0.Y6ncCsHHsX6BwtgpjlTgsf5KXILHrwGbHBhFnIm_uYM"
+
+    const socket = io("http://localhost:3000", {
+      query: { token: TOKEN }
+    });
+
+    socket.on("connect", () => {
+      document.getElementById("status").innerText = "Connected! ✅ ID: " + socket.id;
+    });
+
+    socket.on("joined", (data) => {
+      console.log("🎉 Joined data:", data);
+      if (typeof data === 'string') {
+        addMessage("JOINED: " + data);
+      } else {
+        addMessage(`🎉 JOINED: ${data.user?.name || "Unknown"} - ${data.message}`);
+      }
+    });
+
+    socket.on("new_message", (msg) => {
+      console.log("📬 Full message object:", msg);
+      const userName = msg.user?.name || "Unknown";
+      addMessage(`👤 ${userName}: ${msg.content}`);
+    });
+
+    socket.on("error", (err) => {
+      addMessage("ERROR: " + err);
+    });
+
+    socket.on("disconnect", () => {
+      document.getElementById("status").innerText = "Disconnected ❌";
+    });
+
+    function joinRoom() {
+      socket.emit("join_room", 'a9dd5556-cdfd-43b6-884d-f9bd8fef6103');
+    }
+
+    function sendMsg() {
+      const content = document.getElementById("msg").value;
+      socket.emit("send_message", { roomId: 'a9dd5556-cdfd-43b6-884d-f9bd8fef6103', content });
+      document.getElementById("msg").value = "";
+    }
+
+    function addMessage(text) {
+      const div = document.createElement("div");
+      div.innerText = text;
+      document.getElementById("messages").appendChild(div);
+    }
+  </script>
+</body>
+</html>
