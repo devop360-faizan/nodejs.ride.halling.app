@@ -22,7 +22,7 @@ const register = async (req, res) => {
 const login = async (req, res) => {
     try {
         const user = await authService.loginUser(req.body);
-        const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1m' });
+        const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '4h' });
         const responseData = { ...userResource(user), token };
         return successResponse(res, "Login successful!", responseData);
     } catch (error) {
